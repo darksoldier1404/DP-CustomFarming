@@ -1,0 +1,63 @@
+Lang: Korean
+
+# Commands
+
+cmd_create: "/dpcf create <name> - 시드 생성 (기본값 밀씨앗)"
+cmd_remove: "/dpcf remove <name> - 시드 삭제"
+cmd_crops: "/dpcf crops <name> - 다자란 작물 블럭 설정"
+cmd_time: "/dpcf time <name> <sec> - 자라는 시간 설정"
+cmd_drops: "/dpcf drops <name> - GUI 오픈, 드랍 아이템 지정"
+cmd_chance: "/dpcf chance <name> - GUI 오픈, 확률 설정"
+cmd_placelimit: "/dpcf placelimit <name> <Integer> - 심기 제한."
+cmd_worldlimit: "/dpcf worldlimit <name> <world> - 해당 월드에서만 심어지도록 설정 (토글)"
+cmd_seeditem: "/dpcf seeditem <name> - 시드 아이템 설정"
+cmd_seeddrop: "/dpcf seeddrop <name> <count> - 드랍 아이템 수량 설정"
+cmd_get: "/dpcf get <name> - 시드 가져오기"
+cmd_list: "/dpcf list - 시드 목록 보기"
+cmd_count: "/dpcf count - 데이터에 존재하는 모든 심어진 작물 수 카운트"
+cmd_reload: "/dpcf reload - config.yml만 리로드."
+
+# Events
+
+event_remained_time: "&b남은 시간 : {0}"
+event_wrong_world: "&c해당 작물은 이 월드에서 심을 수 없습니다."
+event_limit_seed: "&c해당 작물을 더 심을 수 없습니다."
+
+# Functions
+
+func_cmd_playerOnly: "플레이어만 사용할 수 있는 명령어입니다."
+func_reload: "설정 파일을 리로드했습니다."
+func_seedAlreadyExists: "이미 존재하는 시드입니다."
+func_seedNotExists: "존재하지 않는 시드입니다."
+func_seedCreated: "시드가 생성되었습니다."
+func_seedRemoved: "시드가 삭제되었습니다."
+func_seedGrowthTimeSet: "성장 시간이 설정되었습니다."
+func_seedList: "&f< &e시드 목록 &f>"
+func_seedListContext: "&a- &f{0} &7(아이템: {1} 성장 시간: {2}초, 제한: {3} 월드 제한: {4})"
+func_seedCount: "&a총 심어진 작물 수 : {0}"
+func_setLimit: "&a제한이 설정되었습니다."
+func_setSeedDropCount: "&a시드 기본드랍 수량이 설정되었습니다."
+func_NumberFormatException: "숫자만 입력해주세요."
+func_enter_chance: "&a확률을 입력해주세요."
+func_chance_over: "&c100 이하의 숫자만 입력해주세요."
+func_chance_set: "&a확률이 설정되었습니다."
+func_worldlimit_remove: "&a월드 제한에서 {0} 이(가) 제거되었습니다."
+func_worldlimit_add: "&a월드 제한에 {0} 이(가) 추가되었습니다."
+func_cmd_seedItemNotExists: "&c시드 아이템이 설정되어있지 않습니다."
+func_cmd_seedItemSaved: "&a시드 아이템이 설정 되었습니다."
+
+# Function Item Lore
+
+item_seed_name: "&f[ &e커스텀 농작물 &f] &b{0}"
+item_seed_lore_1: "&7커스텀 시드 아이템"
+item_seed_lore_2: "&7성장 시간 : {0} 초"
+
+# Function Inventory
+
+inv_seed_crops_title: "&f[ &e작물 블럭 설정 &f] &b{0}"
+inv_seed_crops_BlockTypeException: "블럭 타입이 아닙니다."
+inv_seed_crops_BlockTypeSet: "블럭 타입이 설정되었습니다."
+inv_seed_drops_title: "&f[ &e드랍 아이템 설정 &f] &b{0}"
+inv_seed_drops_DropItemSet: "드랍 아이템이 설정되었습니다."
+inv_seed_chance_title: "&f[ &e드랍 확률 설정 &f] &b{0}"
+inv_seed_item_title: "&f[ &e시드 아이템 설정 &f] &b{0}"

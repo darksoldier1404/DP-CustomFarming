@@ -1,0 +1,63 @@
+Lang: English
+
+# Commands
+
+cmd_create: "/dpcf create <name> - Create a seed (default: wheat seed)"
+cmd_remove: "/dpcf remove <name> - Remove a seed"
+cmd_crops: "/dpcf crops <name> - Set the fully grown crop block"
+cmd_time: "/dpcf time <name> <sec> - Set the growth time"
+cmd_drops: "/dpcf drops <name> - Open GUI to set drop items"
+cmd_chance: "/dpcf chance <name> - Open GUI to set drop chances"
+cmd_placelimit: "/dpcf placelimit <name> <Integer> - Set planting limit"
+cmd_worldlimit: "/dpcf worldlimit <name> <world> - Restrict planting to a specific world (toggle)"
+cmd_seeditem: "/dpcf seeditem <name> - Open GUI to set seed item"
+cmd_seeddrop: "/dpcf seeddrop <name> <count> - Set the number of dropped items"
+cmd_get: "/dpcf get <name> - Obtain a seed"
+cmd_list: "/dpcf list - View the list of seeds"
+cmd_count: "/dpcf count - Count all planted crops in the data"
+cmd_reload: "/dpcf reload - Reload config.yml only"
+
+# Events
+
+event_remained_time: "&bRemaining time: {0}"
+event_wrong_world: "&cThis crop cannot be planted in this world."
+event_limit_seed: "&cYou cannot plant more of this crop."
+
+# Functions
+
+func_cmd_playerOnly: "This command can only be used by players."
+func_reload: "Configuration file has been reloaded."
+func_seedAlreadyExists: "This seed already exists."
+func_seedNotExists: "This seed does not exist."
+func_seedCreated: "Seed has been created."
+func_seedRemoved: "Seed has been removed."
+func_seedGrowthTimeSet: "Growth time has been set."
+func_seedList: "&f< &eSeed List &f>"
+func_seedListContext: "&a- &f{0} &7(Item: {1}, Growth Time: {2} seconds, Limit: {3}, World Restriction: {4})"
+func_seedCount: "&aTotal planted crops: {0}"
+func_setLimit: "&aLimit has been set."
+func_setSeedDropCount: "&aDefault seed drop count has been set."
+func_NumberFormatException: "Please enter only numbers."
+func_enter_chance: "&aPlease enter a probability."
+func_chance_over: "&cPlease enter a number less than or equal to 100."
+func_chance_set: "&aProbability has been set."
+func_worldlimit_remove: "&a{0} has been removed from world restrictions."
+func_worldlimit_add: "&a{0} has been added to world restrictions."
+func_cmd_seedItemNotExists: "&cseed item dose not exist."
+func_cmd_seedItemSaved: "&aseed item has been set."
+
+# Function Item Lore
+
+item_seed_name: "&f[ &eCustom Crop &f] &b{0}"
+item_seed_lore_1: "&7Custom Seed Item"
+item_seed_lore_2: "&7Growth Time: {0} seconds"
+
+# Function Inventory
+
+inv_seed_crops_title: "&f[ &eCrop Block Settings &f] &b{0}"
+inv_seed_crops_BlockTypeException: "This is not a block type."
+inv_seed_crops_BlockTypeSet: "Block type has been set."
+inv_seed_drops_title: "&f[ &eDrop Item Settings &f] &b{0}"
+inv_seed_drops_DropItemSet: "Drop item has been set."
+inv_seed_chance_title: "&f[ &eDrop Chance Settings &f] &b{0}"
+inv_seed_item_title: "&f[ &eSeed Item Settings &f] &b{0}"
