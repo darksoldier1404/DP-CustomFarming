@@ -1,6 +1,6 @@
-package com.darksoldier1029.dpcf.commands;
+package com.darksoldier1404.dpcf.commands;
 
-import com.darksoldier1029.dpcf.functions.DPCFFuntion;
+import com.darksoldier1404.dpcf.functions.DPCFFuntion;
 import com.darksoldier1404.dppc.builder.command.CommandBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.darksoldier1029.dpcf.CustomFarming.plugin;
-import static com.darksoldier1029.dpcf.CustomFarming.prefix;
-import static com.darksoldier1029.dpcf.CustomFarming.lang;
+import static com.darksoldier1404.dpcf.CustomFarming.plugin;
+import static com.darksoldier1404.dpcf.CustomFarming.prefix;
+import static com.darksoldier1404.dpcf.CustomFarming.lang;
 
 public class DPCFCommand {
     private final CommandBuilder builder;
