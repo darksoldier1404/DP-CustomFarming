@@ -28,6 +28,9 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Execute Gradle build
+        env:
+          REPO_PUBLIC: ${{ secrets.REPO_PUBLIC }}
+          REPO_DPP: ${{ secrets.REPO_DPP }}
         run: ./gradlew jar
 
       - name: Run read-yaml action
