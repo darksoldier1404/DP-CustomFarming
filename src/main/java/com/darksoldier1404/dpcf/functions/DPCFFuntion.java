@@ -1,7 +1,7 @@
-package com.darksoldier1029.dpcf.functions;
+package com.darksoldier1404.dpcf.functions;
 
-import com.darksoldier1029.dpcf.chunk.ChunkCacheManager;
-import com.darksoldier1029.dpcf.data.SeedData;
+import com.darksoldier1404.dpcf.chunk.ChunkCacheManager;
+import com.darksoldier1404.dpcf.data.SeedData;
 import com.darksoldier1404.dppc.api.inventory.DInventory;
 import com.darksoldier1404.dppc.lang.DLang;
 import com.darksoldier1404.dppc.utils.ColorUtils;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.*;
 
-import static com.darksoldier1029.dpcf.CustomFarming.*;
+import static com.darksoldier1404.dpcf.CustomFarming.*;
 
 @SuppressWarnings("static-access")
 public class DPCFFuntion {
@@ -152,7 +152,7 @@ public class DPCFFuntion {
             return;
         }
         YamlConfiguration data = getSeed(seed);
-        data.set("Seeds." + seed + ".SeedGrowTime", growTime);
+        data.set("Seeds." + seed + ".SeedGrowTime", Integer.parseInt(growTime));
         plugin.seeds.put(seed, data);
         ConfigUtils.saveCustomData(plugin, data, seed, "seeds");
         sender.sendMessage(prefix + lang.get("func_seedGrowthTimeSet"));
