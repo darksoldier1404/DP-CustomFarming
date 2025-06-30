@@ -516,7 +516,6 @@ public class DPCFFuntion {
         if (worlds.contains(worldName)) {
             worlds.remove(worldName);
             sender.sendMessage(prefix + lang.getWithArgs("func_worldlimit_remove", worldName));
-            return;
         } else {
             worlds.add(worldName);
             sender.sendMessage(prefix + lang.getWithArgs("func_worldlimit_add", worldName));
