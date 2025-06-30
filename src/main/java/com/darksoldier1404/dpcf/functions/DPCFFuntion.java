@@ -229,10 +229,10 @@ public class DPCFFuntion {
             if (data == null) {
                 continue;
             }
-            String name = data.getString("Seeds." + seed + ".Name");
+            String name = seed;
             String material = data.getItemStack("Seeds." + seed + ".ItemMaterial") == null ? "None" : data.getItemStack("Seeds." + seed + ".ItemMaterial").getType().toString();
-            String growTime = String.valueOf(data.getInt("Seeds." + seed + ".SeedGrowTime"));
-            String limit = String.valueOf(data.getInt("Seeds." + seed + ".Limit", -1));
+            String growTime = String.valueOf(data.getInt("Seeds." + seed + ".SeedGrowTime", 0));
+            String limit = String.valueOf(data.getInt("Seeds." + seed + ".Limit", 0));
             String worldLimit = "";
             if (data.isConfigurationSection("Seeds." + seed + ".WorldLimit")) {
                 for (String world : data.getConfigurationSection("Seeds." + seed + ".WorldLimit").getKeys(false)) {
@@ -468,7 +468,7 @@ public class DPCFFuntion {
             return;
         }
         YamlConfiguration data = getSeed(name);
-        data.set("Seeds." + name + ".Limit", limit);
+        data.set("Seeds." + name + ".Limit", Integer.parseInt(limit));
         ConfigUtils.saveCustomData(plugin, data, name, "seeds");
         plugin.seeds.put(name, data);
         sender.sendMessage(prefix + lang.get("func_setLimit"));
@@ -486,6 +486,7 @@ public class DPCFFuntion {
     public static void countSeedPlace(UUID uuid, String seed) {
         YamlConfiguration data = plugin.udata.get(uuid);
         int count = data.getInt("Count.Seed." + seed);
+        if (count < 0) count = 0; // 음수 방지
         data.set("Count.Seed." + seed, count + 1);
         plugin.udata.put(uuid, data);
     }
@@ -493,7 +494,11 @@ public class DPCFFuntion {
     public static void countSeedBreak(UUID uuid, String seed) {
         YamlConfiguration data = plugin.udata.get(uuid);
         int count = data.getInt("Count.Seed." + seed);
-        data.set("Count.Seed." + seed, count - 1);
+        if (count <= 0) {
+            data.set("Count.Seed." + seed, 0); // 음수 방지
+        } else {
+            data.set("Count.Seed." + seed, count - 1);
+        }
         plugin.udata.put(uuid, data);
     }
 
@@ -530,11 +535,8 @@ public class DPCFFuntion {
             return false;
         }
         YamlConfiguration data = getSeed(seed);
-        if (data.isConfigurationSection("Seeds." + seed + ".WorldLimit")) {
-            List<String> worlds = data.getStringList("Seeds." + seed + ".WorldLimit");
-            return worlds.contains(world);
-        }
-        return false;
+        List<String> worlds = data.getStringList("Seeds." + seed + ".WorldLimit");
+        return worlds.contains(world);
     }
 
     public static void setSeedDropCount(CommandSender sender, String name, String count) {
@@ -543,7 +545,7 @@ public class DPCFFuntion {
             return;
         }
         YamlConfiguration data = getSeed(name);
-        data.set("Seeds." + name + ".SeedDropCount", count);
+        data.set("Seeds." + name + ".SeedDropCount", Integer.parseInt(count));
         ConfigUtils.saveCustomData(plugin, data, name, "seeds");
         plugin.seeds.put(name, data);
         sender.sendMessage(prefix + lang.get("func_setSeedDropCount"));

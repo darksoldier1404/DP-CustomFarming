@@ -69,12 +69,12 @@ public class DPCFEvent implements Listener {
                 p.sendMessage(prefix + CustomFarming.lang.get("event_wrong_world"));
                 return;
             }
-            if (DPCFFuntion.getSeedLimit(seedName) != 0) {
-                if (DPCFFuntion.getSeedCount(p, seedName) >= DPCFFuntion.getSeedLimit(seedName)) {
-                    e.setCancelled(true);
-                    p.sendMessage(prefix + CustomFarming.lang.get("event_limit_seed"));
-                    return;
-                }
+            int limit = DPCFFuntion.getSeedLimit(seedName);
+            int current = DPCFFuntion.getSeedCount(p, seedName);
+            if (limit > 0 && current >= limit) {
+                e.setCancelled(true);
+                p.sendMessage(prefix + CustomFarming.lang.get("event_limit_seed"));
+                return;
             }
             DPCFFuntion.countSeedPlace(p.getUniqueId(), seedName);
             int remainingTime = DPCFFuntion.getSeed(seedName).getInt("Seeds." + seedName + ".SeedGrowTime");
