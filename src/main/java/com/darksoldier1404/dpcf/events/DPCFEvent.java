@@ -100,8 +100,8 @@ public class DPCFEvent implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
-        if (e.getInventory() instanceof DInventory) {
-            DInventory inv = (DInventory) e.getInventory();
+        if (e.getInventory().getHolder() instanceof DInventory) {
+            DInventory inv = (DInventory) e.getInventory().getHolder();
             if (inv.isValidHandler(CustomFarming.plugin)) {
                 if (inv.getObj() instanceof Tuple) {
                     Tuple<String, String> tuple = (Tuple<String, String>) inv.getObj();
@@ -125,8 +125,8 @@ public class DPCFEvent implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getInventory() instanceof DInventory) {
-            DInventory inv = (DInventory) e.getInventory();
+        if (e.getInventory().getHolder() instanceof DInventory) {
+            DInventory inv = (DInventory) e.getInventory().getHolder();
             if (inv.isValidHandler(CustomFarming.plugin)) {
                 if (e.getCurrentItem() == null || e.getCurrentItem().getType().isAir()) return;
                 ItemStack item = e.getCurrentItem();
