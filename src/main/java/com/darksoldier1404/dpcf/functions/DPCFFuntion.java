@@ -193,7 +193,7 @@ public class DPCFFuntion {
         ItemStack item = data.getItemStack("Seeds." + seed + ".ItemMaterial");
         if (item == null) return null;
         ItemMeta meta = item.getItemMeta();
-        if(meta == null) return null;
+        if (meta == null) return null;
         meta.setDisplayName(lang.getWithArgs("item_seed_name", seed));
         List<String> lore = new ArrayList<>();
         lore.add(lang.get("item_seed_lore_1"));
@@ -259,7 +259,7 @@ public class DPCFFuntion {
             return;
         }
         YamlConfiguration data = getSeed(seed);
-        DInventory inv = new DInventory(null, lang.getWithArgs("inv_seed_crops_title", seed), 27, plugin);
+        DInventory inv = new DInventory(lang.getWithArgs("inv_seed_crops_title", seed), 27, plugin);
         ItemStack pane = NBT.setStringTag(new ItemStack(Material.BLACK_STAINED_GLASS_PANE), "dpcf_pane", "true");
         for (int i = 0; i < 27; i++) {
             inv.setItem(i, pane);
@@ -267,7 +267,7 @@ public class DPCFFuntion {
         inv.setItem(13, data.getItemStack("Seeds." + seed + ".Material"));
         Tuple<String, String> tuple = new Tuple<>("dpcf_material", seed);
         inv.setObj(tuple);
-        p.openInventory(inv);
+        p.openInventory(inv.getInventory());
     }
 
     public static void saveSeedBlock(String seed, DInventory inv, Player p) {
@@ -301,7 +301,7 @@ public class DPCFFuntion {
             p.sendMessage(prefix + lang.get("func_seedNotExists"));
             return;
         }
-        DInventory inv = new DInventory(null, lang.getWithArgs("inv_seed_drops_title", seed), 27, plugin);
+        DInventory inv = new DInventory(lang.getWithArgs("inv_seed_drops_title", seed), 27, plugin);
         YamlConfiguration data = getSeed(seed);
         if (data.isConfigurationSection("Seeds." + seed + ".Drops")) {
             for (String key : data.getConfigurationSection("Seeds." + seed + ".Drops").getKeys(false)) {
@@ -312,7 +312,7 @@ public class DPCFFuntion {
         }
         Tuple<String, String> tuple = new Tuple<>("dpcf_drops", seed);
         inv.setObj(tuple);
-        p.openInventory(inv);
+        p.openInventory(inv.getInventory());
     }
 
     public static void saveDrops(String seed, DInventory inv, Player p) {
@@ -340,7 +340,7 @@ public class DPCFFuntion {
             p.sendMessage(prefix + lang.get("func_seedNotExists"));
             return;
         }
-        DInventory inv = new DInventory(null, lang.getWithArgs("inv_seed_chance_title", seed), 27, plugin);
+        DInventory inv = new DInventory(lang.getWithArgs("inv_seed_chance_title", seed), 27, plugin);
         YamlConfiguration data = getSeed(seed);
         if (data.isConfigurationSection("Seeds." + seed + ".Drops")) {
             for (String key : data.getConfigurationSection("Seeds." + seed + ".Drops").getKeys(false)) {
@@ -351,7 +351,7 @@ public class DPCFFuntion {
         }
         Tuple<String, String> tuple = new Tuple<>("dpcf_chance", seed);
         inv.setObj(tuple);
-        p.openInventory(inv);
+        p.openInventory(inv.getInventory());
     }
 
     public static void setChanceWithChat(Player p, String seed, int slot) {
@@ -557,7 +557,7 @@ public class DPCFFuntion {
         }
         Player p = (Player) sender;
         YamlConfiguration data = getSeed(name);
-        DInventory inv = new DInventory(null, lang.getWithArgs("inv_seed_item_title", name), 27, plugin);
+        DInventory inv = new DInventory(lang.getWithArgs("inv_seed_item_title", name), 27, plugin);
         ItemStack pane = NBT.setStringTag(new ItemStack(Material.BLACK_STAINED_GLASS_PANE), "dpcf_pane", "true");
         for (int i = 0; i < 27; i++) {
             inv.setItem(i, pane);
@@ -571,7 +571,7 @@ public class DPCFFuntion {
         }
         Tuple<String, String> tuple = new Tuple<>("dpcf_seeditem", name);
         inv.setObj(tuple);
-        p.openInventory(inv);
+        p.openInventory(inv.getInventory());
     }
 
     public static void saveSeedItem(String name, DInventory inv, Player p) {
@@ -579,7 +579,7 @@ public class DPCFFuntion {
         YamlConfiguration data = getSeed(name);
         if (item == null || item.getType() == Material.AIR) {
             data.set("Seeds." + name + ".ItemMaterial", null);
-        }else{
+        } else {
             data.set("Seeds." + name + ".ItemMaterial", item);
         }
         ConfigUtils.saveCustomData(plugin, data, name, "seeds");
