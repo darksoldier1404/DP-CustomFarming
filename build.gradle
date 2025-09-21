@@ -7,7 +7,7 @@ group 'com.darksoldier1404'
 
 // ##################################################
 
-version = '1.0.1.5'
+version = '2.0.0'
 var pluginName = 'DP-CustomFarming'
 var packageName = 'com.darksoldier1404.dpcf'
 var apiVersion = '1.18.2'
@@ -96,5 +96,5 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     compileOnly "com.bukkit:craftbukkit:" + apiVersion
     compileOnly "com.bukkit:spigot:" + apiVersion
-    compileOnly "com.darksoldier1404.dppc:DPP-Core:4-SNAPSHOT"
+    compileOnly "com.darksoldier1404.dppc:DPP-Core:5.2-SNAPSHOT"
 }

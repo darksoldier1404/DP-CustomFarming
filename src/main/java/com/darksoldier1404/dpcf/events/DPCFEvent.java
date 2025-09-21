@@ -24,7 +24,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-import static com.darksoldier1404.dpcf.CustomFarming.prefix;
+import static com.darksoldier1404.dpcf.CustomFarming.plugin;
 
 public class DPCFEvent implements Listener {
 
@@ -51,7 +51,7 @@ public class DPCFEvent implements Listener {
                     DPCFFuntion.countSeedBreak(UUID.fromString(seedData.getOwner()), DPCFFuntion.getSeedData(b.getWorld().getName(), b.getX(), b.getY(), b.getZ()).getSeed());
                     DPCFFuntion.drop(seedData, true);
                 } else {
-                    p.sendTitle("§a" + seedData.getSeed(), CustomFarming.lang.getWithArgs("event_remained_time", String.valueOf(seedData.getRemainingTime())), 10, 40, 10);
+                    p.sendTitle("§a" + seedData.getSeed(), plugin.getLang().getWithArgs("event_remained_time", String.valueOf(seedData.getRemainingTime())), 10, 40, 10);
                 }
             }
         }
@@ -66,14 +66,14 @@ public class DPCFEvent implements Listener {
             Block b = e.getBlock();
             if (DPCFFuntion.isWorldLimit(seedName, b.getWorld().getName())) {
                 e.setCancelled(true);
-                p.sendMessage(prefix + CustomFarming.lang.get("event_wrong_world"));
+                p.sendMessage(plugin.getPrefix() + plugin.getLang().get("event_wrong_world"));
                 return;
             }
             int limit = DPCFFuntion.getSeedLimit(seedName);
             int current = DPCFFuntion.getSeedCount(p, seedName);
             if (limit > 0 && current >= limit) {
                 e.setCancelled(true);
-                p.sendMessage(prefix + CustomFarming.lang.get("event_limit_seed"));
+                p.sendMessage(plugin.getPrefix() + plugin.getLang().get("event_limit_seed"));
                 return;
             }
             DPCFFuntion.countSeedPlace(p.getUniqueId(), seedName);

@@ -3,8 +3,6 @@ package com.darksoldier1404.dpcf.functions;
 import com.darksoldier1404.dpcf.chunk.ChunkCacheManager;
 import com.darksoldier1404.dpcf.data.SeedData;
 import com.darksoldier1404.dppc.api.inventory.DInventory;
-import com.darksoldier1404.dppc.lang.DLang;
-import com.darksoldier1404.dppc.utils.ColorUtils;
 import com.darksoldier1404.dppc.utils.ConfigUtils;
 import com.darksoldier1404.dppc.utils.NBT;
 import com.darksoldier1404.dppc.utils.Tuple;
@@ -32,24 +30,12 @@ import static com.darksoldier1404.dpcf.CustomFarming.*;
 @SuppressWarnings("static-access")
 public class DPCFFuntion {
     public static void init() {
-        config = ConfigUtils.loadDefaultPluginConfig(plugin);
-        plugin.lang = new DLang(config.getString("Settings.Lang"), plugin);
         plugin.data = ConfigUtils.createCustomData(plugin, "data");
-        prefix = ColorUtils.applyColor(config.getString("Settings.Prefix"));
-        plugin.seeds.clear();
-        for (YamlConfiguration data : ConfigUtils.loadCustomDataList(plugin, "seeds")) {
-            String name = data.getString("Seeds.Name");
-            if (name != null && !name.isEmpty()) {
-                plugin.seeds.put(name, data);
-            }
-        }
     }
 
     public static void reloadConfig(CommandSender sender) {
-        config = ConfigUtils.loadDefaultPluginConfig(plugin);
-        prefix = ColorUtils.applyColor(config.getString("Settings.Prefix"));
-        plugin.lang = new DLang(config.getString("Settings.Lang"), plugin);
-        sender.sendMessage(prefix + lang.get("func_reload"));
+        plugin.reload();
+        sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_reload"));
     }
 
     public static void loadSeedData() {
@@ -121,41 +107,41 @@ public class DPCFFuntion {
     // command functions
     public static void addSeed(CommandSender sender, String seed) {
         if (checkSeed(seed)) {
-            sender.sendMessage(prefix + lang.get("func_reload"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_reload"));
             return;
         }
         YamlConfiguration data = new YamlConfiguration();
         data.set("Seeds.Name", seed);
         data.set("Seeds." + seed + ".SeedGrowTime", 120);
-        ConfigUtils.saveCustomData(plugin, data, seed, "seeds");
+        plugin.saveDataContainer();
         plugin.seeds.put(seed, data);
-        sender.sendMessage(prefix + lang.get("func_seedCreated"));
+        sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedCreated"));
     }
 
     public static void removeSeed(CommandSender sender, String seed) {
         if (!checkSeed(seed)) {
-            sender.sendMessage(prefix + lang.get("func_seedNotExists"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
         new File(plugin.getDataFolder(), "seeds/" + seed + ".yml").delete();
         plugin.seeds.remove(seed);
-        sender.sendMessage(prefix + lang.get("func_seedRemoved"));
+        sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedRemoved"));
     }
 
     public static void setGrowTime(CommandSender sender, String seed, String growTime) {
         if (!checkSeed(seed)) {
-            sender.sendMessage(prefix + lang.get("func_seedNotExists"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
         if (!growTime.matches("[0-9]+")) {
-            sender.sendMessage(prefix + lang.get("func_NumberFormatException"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_NumberFormatException"));
             return;
         }
         YamlConfiguration data = getSeed(seed);
         data.set("Seeds." + seed + ".SeedGrowTime", Integer.parseInt(growTime));
         plugin.seeds.put(seed, data);
-        ConfigUtils.saveCustomData(plugin, data, seed, "seeds");
-        sender.sendMessage(prefix + lang.get("func_seedGrowthTimeSet"));
+        plugin.saveDataContainer();
+        sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedGrowthTimeSet"));
     }
 
     public static boolean checkSeed(String seed) {
@@ -194,10 +180,10 @@ public class DPCFFuntion {
         if (item == null) return null;
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return null;
-        meta.setDisplayName(lang.getWithArgs("item_seed_name", seed));
+        meta.setDisplayName(plugin.getLang().getWithArgs("item_seed_name", seed));
         List<String> lore = new ArrayList<>();
-        lore.add(lang.get("item_seed_lore_1"));
-        lore.add(lang.getWithArgs("item_seed_lore_2", String.valueOf(data.getInt("Seeds." + seed + ".SeedGrowTime"))));
+        lore.add(plugin.getLang().get("item_seed_lore_1"));
+        lore.add(plugin.getLang().getWithArgs("item_seed_lore_2", String.valueOf(data.getInt("Seeds." + seed + ".SeedGrowTime"))));
         meta.setLore(lore);
         item.setItemMeta(meta);
         item = NBT.setStringTag(item, "dpcf_seed", seed);
@@ -206,24 +192,24 @@ public class DPCFFuntion {
 
     public static void giveSeedItem(CommandSender sender, String seed) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(prefix + lang.get("func_cmd_playerOnly"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_cmd_playerOnly"));
             return;
         }
         Player p = (Player) sender;
         if (!checkSeed(seed)) {
-            p.sendMessage(prefix + lang.get("func_seedNotExists"));
+            p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
         ItemStack item = getSeedItem(seed);
         if (item == null) {
-            sender.sendMessage(prefix + lang.get("func_cmd_seedItemNotExists"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_cmd_seedItemNotExists"));
             return;
         }
         p.getInventory().addItem(item);
     }
 
     public static void listSeed(CommandSender sender) {
-        sender.sendMessage(prefix + lang.get("func_seedList"));
+        sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedList"));
         for (String seed : plugin.seeds.keySet()) {
             YamlConfiguration data = getSeed(seed);
             if (data == null) {
@@ -244,22 +230,22 @@ public class DPCFFuntion {
             } else {
                 worldLimit = "None";
             }
-            sender.sendMessage(lang.getWithArgs("func_seedListContext", name, material, growTime, limit, worldLimit));
+            sender.sendMessage(plugin.getLang().getWithArgs("func_seedListContext", name, material, growTime, limit, worldLimit));
         }
     }
 
     public static void setSeedBlock(CommandSender sender, String seed) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(prefix + lang.get("func_cmd_playerOnly"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_cmd_playerOnly"));
             return;
         }
         Player p = (Player) sender;
         if (!checkSeed(seed)) {
-            p.sendMessage(prefix + lang.get("func_seedNotExists"));
+            p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
         YamlConfiguration data = getSeed(seed);
-        DInventory inv = new DInventory(lang.getWithArgs("inv_seed_crops_title", seed), 27, plugin);
+        DInventory inv = new DInventory(plugin.getLang().getWithArgs("inv_seed_crops_title", seed), 27, plugin);
         ItemStack pane = NBT.setStringTag(new ItemStack(Material.BLACK_STAINED_GLASS_PANE), "dpcf_pane", "true");
         for (int i = 0; i < 27; i++) {
             inv.setItem(i, pane);
@@ -275,33 +261,33 @@ public class DPCFFuntion {
         YamlConfiguration data = getSeed(seed);
         if (item == null || item.getType() == Material.AIR) {
             data.set("Seeds." + seed + ".Material", null);
-            ConfigUtils.saveCustomData(plugin, data, seed, "seeds");
+            plugin.saveDataContainer();
             plugin.seeds.put(seed, data);
             return;
         }
         try {
             item.getType().createBlockData();
         } catch (Exception e) {
-            p.sendMessage(prefix + lang.get("inv_seed_crops_BlockTypeException"));
+            p.sendMessage(plugin.getPrefix() + plugin.getLang().get("inv_seed_crops_BlockTypeException"));
             return;
         }
         data.set("Seeds." + seed + ".Material", item);
-        ConfigUtils.saveCustomData(plugin, data, seed, "seeds");
+        plugin.saveDataContainer();
         plugin.seeds.put(seed, data);
-        p.sendMessage(prefix + lang.get("inv_seed_crops_BlockTypeSet"));
+        p.sendMessage(plugin.getPrefix() + plugin.getLang().get("inv_seed_crops_BlockTypeSet"));
     }
 
     public static void setDrops(CommandSender sender, String seed) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(prefix + lang.get("func_cmd_playerOnly"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_cmd_playerOnly"));
             return;
         }
         Player p = (Player) sender;
         if (!checkSeed(seed)) {
-            p.sendMessage(prefix + lang.get("func_seedNotExists"));
+            p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
-        DInventory inv = new DInventory(lang.getWithArgs("inv_seed_drops_title", seed), 27, plugin);
+        DInventory inv = new DInventory(plugin.getLang().getWithArgs("inv_seed_drops_title", seed), 27, plugin);
         YamlConfiguration data = getSeed(seed);
         if (data.isConfigurationSection("Seeds." + seed + ".Drops")) {
             for (String key : data.getConfigurationSection("Seeds." + seed + ".Drops").getKeys(false)) {
@@ -325,22 +311,22 @@ public class DPCFFuntion {
                 data.set("Seeds." + seed + ".Drops." + i, null);
             }
         }
-        ConfigUtils.saveCustomData(plugin, data, seed, "seeds");
+        plugin.saveDataContainer();
         plugin.seeds.put(seed, data);
-        p.sendMessage(prefix + lang.get("inv_seed_drops_DropItemSet"));
+        p.sendMessage(plugin.getPrefix() + plugin.getLang().get("inv_seed_drops_DropItemSet"));
     }
 
     public static void openChanceSettings(CommandSender sender, String seed) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(prefix + lang.get("func_cmd_playerOnly"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_cmd_playerOnly"));
             return;
         }
         Player p = (Player) sender;
         if (!checkSeed(seed)) {
-            p.sendMessage(prefix + lang.get("func_seedNotExists"));
+            p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
-        DInventory inv = new DInventory(lang.getWithArgs("inv_seed_chance_title", seed), 27, plugin);
+        DInventory inv = new DInventory(plugin.getLang().getWithArgs("inv_seed_chance_title", seed), 27, plugin);
         YamlConfiguration data = getSeed(seed);
         if (data.isConfigurationSection("Seeds." + seed + ".Drops")) {
             for (String key : data.getConfigurationSection("Seeds." + seed + ".Drops").getKeys(false)) {
@@ -355,26 +341,26 @@ public class DPCFFuntion {
     }
 
     public static void setChanceWithChat(Player p, String seed, int slot) {
-        p.sendMessage(prefix + lang.get("func_enter_chance"));
+        p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_enter_chance"));
         p.closeInventory();
         plugin.chanceSet.put(p.getUniqueId(), new Tuple<>(slot, seed));
     }
 
     public static void setChance(Player p, String chance, String seed, int slot) {
         if (!chance.matches("[0-9]+")) {
-            p.sendMessage(prefix + lang.get("func_NumberFormatException"));
+            p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_NumberFormatException"));
             return;
         }
         if (Integer.parseInt(chance) > 100) {
-            p.sendMessage(prefix + lang.get("func_chance_over"));
+            p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_chance_over"));
             return;
         }
         YamlConfiguration data = getSeed(seed);
         data.set("Seeds." + seed + ".Drops." + slot + ".Chance", Integer.parseInt(chance));
-        ConfigUtils.saveCustomData(plugin, data, seed, "seeds");
+        plugin.saveDataContainer();
         plugin.seeds.put(seed, data);
         plugin.chanceSet.remove(p.getUniqueId());
-        p.sendMessage(prefix + lang.get("func_chance_set"));
+        p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_chance_set"));
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             openChanceSettings(p, seed);
         }, 1L);
@@ -455,23 +441,23 @@ public class DPCFFuntion {
     }
 
     public static void countSeed(CommandSender sender) {
-        sender.sendMessage(prefix + lang.getWithArgs("func_seedCount", String.valueOf(plugin.seedDataSet.size())));
+        sender.sendMessage(plugin.getPrefix() + plugin.getLang().getWithArgs("func_seedCount", String.valueOf(plugin.seedDataSet.size())));
     }
 
     public static void setLimit(CommandSender sender, String name, String limit) {
         if (!limit.matches("[0-9]+")) {
-            sender.sendMessage(prefix + lang.get("func_NumberFormatException"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_NumberFormatException"));
             return;
         }
         if (!checkSeed(name)) {
-            sender.sendMessage(prefix + lang.get("func_seedNotExists"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
         YamlConfiguration data = getSeed(name);
         data.set("Seeds." + name + ".Limit", Integer.parseInt(limit));
-        ConfigUtils.saveCustomData(plugin, data, name, "seeds");
+        plugin.saveDataContainer();
         plugin.seeds.put(name, data);
-        sender.sendMessage(prefix + lang.get("func_setLimit"));
+        sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_setLimit"));
     }
 
     public static void initPlayer(Player p) {
@@ -486,7 +472,7 @@ public class DPCFFuntion {
     public static void countSeedPlace(UUID uuid, String seed) {
         YamlConfiguration data = plugin.udata.get(uuid);
         int count = data.getInt("Count.Seed." + seed);
-        if (count < 0) count = 0; // 음수 방지
+        if (count < 0) count = 0;
         data.set("Count.Seed." + seed, count + 1);
         plugin.udata.put(uuid, data);
     }
@@ -495,7 +481,7 @@ public class DPCFFuntion {
         YamlConfiguration data = plugin.udata.get(uuid);
         int count = data.getInt("Count.Seed." + seed);
         if (count <= 0) {
-            data.set("Count.Seed." + seed, 0); // 음수 방지
+            data.set("Count.Seed." + seed, 0);
         } else {
             data.set("Count.Seed." + seed, count - 1);
         }
@@ -513,17 +499,17 @@ public class DPCFFuntion {
 
     public static void setWorldLimit(CommandSender sender, String seedName, String worldName) {
         if (!checkSeed(seedName)) {
-            sender.sendMessage(prefix + lang.get("func_seedNotExists"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
         YamlConfiguration data = getSeed(seedName);
         List<String> worlds = data.getStringList("Seeds." + seedName + ".WorldLimit");
         if (worlds.contains(worldName)) {
             worlds.remove(worldName);
-            sender.sendMessage(prefix + lang.getWithArgs("func_worldlimit_remove", worldName));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().getWithArgs("func_worldlimit_remove", worldName));
         } else {
             worlds.add(worldName);
-            sender.sendMessage(prefix + lang.getWithArgs("func_worldlimit_add", worldName));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().getWithArgs("func_worldlimit_add", worldName));
         }
         data.set("Seeds." + seedName + ".WorldLimit", worlds);
         ConfigUtils.saveCustomData(plugin, data, seedName, "seeds");
@@ -536,29 +522,34 @@ public class DPCFFuntion {
         }
         YamlConfiguration data = getSeed(seed);
         List<String> worlds = data.getStringList("Seeds." + seed + ".WorldLimit");
-        return worlds.contains(world);
+        for(String w : worlds) {
+            if (w.equalsIgnoreCase(world)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void setSeedDropCount(CommandSender sender, String name, String count) {
         if (!checkSeed(name)) {
-            sender.sendMessage(prefix + lang.get("func_seedNotExists"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
         YamlConfiguration data = getSeed(name);
         data.set("Seeds." + name + ".SeedDropCount", Integer.parseInt(count));
-        ConfigUtils.saveCustomData(plugin, data, name, "seeds");
+        plugin.saveDataContainer();
         plugin.seeds.put(name, data);
-        sender.sendMessage(prefix + lang.get("func_setSeedDropCount"));
+        sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_setSeedDropCount"));
     }
 
     public static void setSeedItem(CommandSender sender, String name) {
         if (!checkSeed(name)) {
-            sender.sendMessage(prefix + lang.get("func_seedNotExists"));
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_seedNotExists"));
             return;
         }
         Player p = (Player) sender;
         YamlConfiguration data = getSeed(name);
-        DInventory inv = new DInventory(lang.getWithArgs("inv_seed_item_title", name), 27, plugin);
+        DInventory inv = new DInventory(plugin.getLang().getWithArgs("inv_seed_item_title", name), 27, plugin);
         ItemStack pane = NBT.setStringTag(new ItemStack(Material.BLACK_STAINED_GLASS_PANE), "dpcf_pane", "true");
         for (int i = 0; i < 27; i++) {
             inv.setItem(i, pane);
@@ -583,8 +574,8 @@ public class DPCFFuntion {
         } else {
             data.set("Seeds." + name + ".ItemMaterial", item);
         }
-        ConfigUtils.saveCustomData(plugin, data, name, "seeds");
+        plugin.saveDataContainer();
         plugin.seeds.put(name, data);
-        p.sendMessage(prefix + lang.get("func_cmd_seedItemSaved"));
+        p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_cmd_seedItemSaved"));
     }
 }
