@@ -37,8 +37,8 @@ public class CustomFarming extends DPlugin {
     @Override
     public void onLoad() {
         PluginUtil.addPlugin(this, 25971);
-        udata = loadDataContainer(new DataContainer<UUID, YamlConfiguration>(this, DataType.YAML, "data"), null);
-        seeds = loadDataContainer(new DataContainer<String, YamlConfiguration>(this, DataType.YAML, "seeds"), null);
+        udata = loadDataContainer(new DataContainer<>(this, DataType.YAML, "data"));
+        seeds = loadDataContainer(new DataContainer<>(this, DataType.YAML, "seeds"));
     }
 
     public void onEnable() {

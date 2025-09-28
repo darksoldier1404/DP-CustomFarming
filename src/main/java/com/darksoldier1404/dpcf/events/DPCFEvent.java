@@ -10,15 +10,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -152,6 +147,39 @@ public class DPCFEvent implements Listener {
         if (CustomFarming.chanceSet.containsKey(p.getUniqueId())) {
             e.setCancelled(true);
             DPCFFuntion.setChance(p, e.getMessage(), CustomFarming.chanceSet.get(p.getUniqueId()).getB(), CustomFarming.chanceSet.get(p.getUniqueId()).getA());
+        }
+    }
+
+    @EventHandler
+    public void onBlockPhysic(BlockPhysicsEvent e) {
+        if (DPCFFuntion.isSeed(e.getBlock().getWorld().getName(), e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockBreakByWater(BlockFromToEvent e) {
+        Block b = e.getToBlock();
+        int x, y, z;
+        x = b.getX();
+        y = b.getY();
+        z = b.getZ();
+        if (DPCFFuntion.isSeed(b.getWorld().getName(), x, y, z)) {
+            if(e.getBlock().getType() == org.bukkit.Material.WATER) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBukkit(PlayerBucketEmptyEvent e) {
+        Block b = e.getBlock();
+        int x, y, z;
+        x = b.getX();
+        y = b.getY();
+        z = b.getZ();
+        if (DPCFFuntion.isSeed(b.getWorld().getName(), x, y, z)) {
+            e.setCancelled(true);
         }
     }
 }

@@ -424,6 +424,7 @@ public class DPCFFuntion {
                 Ageable ageable = (Ageable) targetBlock.getBlockData();
                 ageable.setAge(100000);
                 targetBlock.setBlockData(ageable);
+                return;
             }
             if (itemType == Material.PLAYER_HEAD || itemType == Material.SKELETON_SKULL || itemType == Material.ZOMBIE_HEAD || itemType == Material.CREEPER_HEAD || itemType == Material.WITHER_SKELETON_SKULL || itemType == Material.DRAGON_HEAD) {
                 if (targetBlock.getState() instanceof Skull) {
@@ -433,7 +434,6 @@ public class DPCFFuntion {
                         skull.setOwnerProfile(skullMeta.getOwnerProfile());
                         targetBlock.setBlockData(skull.getBlockData());
                         skull.update();
-                    } else {
                     }
                 }
             }
