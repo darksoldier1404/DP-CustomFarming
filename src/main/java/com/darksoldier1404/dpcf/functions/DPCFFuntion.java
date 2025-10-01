@@ -382,7 +382,14 @@ public class DPCFFuntion {
             plugin.seedDataSet.remove(seedData);
             return;
         }
+
         YamlConfiguration data = getSeed(seedData.getSeed());
+        if(data == null) {
+            plugin.seedDataSet.remove(seedData);
+            System.out.println("[DPCF] Error: Seed data not found for seed " + seedData.getSeed() + ". Removing seed data.");
+            System.out.println("[DPCF] you can ignore this message, this data is old seed data.");
+            return;
+        }
         for (int i = 0; i < 27; i++) {
             ItemStack item = data.getItemStack("Seeds." + seedData.getSeed() + ".Drops." + i + ".Item");
             int chance = data.getInt("Seeds." + seedData.getSeed() + ".Drops." + i + ".Chance");
