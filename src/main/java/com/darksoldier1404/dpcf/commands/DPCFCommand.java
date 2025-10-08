@@ -99,6 +99,12 @@ public class DPCFCommand {
             return true;
         });
 
+        // my
+        builder.addSubCommand("my", plugin.getLang().get("cmd_my"), (p, args) -> {
+            if (args.length == 1) DPCFFuntion.openMyGUI(p);
+            return true;
+        });
+
         List<String> cmds = new ArrayList<>(Arrays.asList("create", "remove", "time", "crops", "drops", "seeditem", "seeddrop", "chance", "placelimit", "worldlimit", "get", "list", "count", "reload"));
         for (String c : cmds) {
             builder.addTabCompletion(c, args -> {

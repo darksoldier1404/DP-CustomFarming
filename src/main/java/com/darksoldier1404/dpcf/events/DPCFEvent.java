@@ -6,7 +6,9 @@ import com.darksoldier1404.dpcf.functions.DPCFFuntion;
 import com.darksoldier1404.dppc.api.inventory.DInventory;
 import com.darksoldier1404.dppc.utils.NBT;
 import com.darksoldier1404.dppc.utils.Tuple;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -42,10 +44,17 @@ public class DPCFEvent implements Listener {
             if (DPCFFuntion.isSeed(b.getWorld().getName(), b.getX(), b.getY(), b.getZ())) {
                 SeedData seedData = DPCFFuntion.getSeedData(b.getWorld().getName(), b.getX(), b.getY(), b.getZ());
                 if (seedData == null) return;
+                if (!seedData.getOwner().equalsIgnoreCase(p.getUniqueId().toString())) {
+                    e.setCancelled(true);
+                    return;
+                }
                 if (seedData.isGrow()) {
+                    e.setCancelled(true);
+                    e.getClickedBlock().setType(Material.AIR);
                     DPCFFuntion.countSeedBreak(UUID.fromString(seedData.getOwner()), DPCFFuntion.getSeedData(b.getWorld().getName(), b.getX(), b.getY(), b.getZ()).getSeed());
                     DPCFFuntion.drop(seedData, true);
                 } else {
+                    e.setCancelled(true);
                     p.sendTitle("§a" + seedData.getSeed(), plugin.getLang().getWithArgs("event_remained_time", String.valueOf(seedData.getRemainingTime())), 10, 40, 10);
                 }
             }
@@ -86,8 +95,13 @@ public class DPCFEvent implements Listener {
         y = b.getY();
         z = b.getZ();
         if (DPCFFuntion.isSeed(b.getWorld().getName(), x, y, z)) {
-            e.setDropItems(false);
             SeedData seedData = DPCFFuntion.getSeedData(b.getWorld().getName(), x, y, z);
+            if (seedData == null) return;
+            if (!seedData.getOwner().equalsIgnoreCase(e.getPlayer().getUniqueId().toString())) {
+                e.setCancelled(true);
+                return;
+            }
+            e.setDropItems(false);
             DPCFFuntion.countSeedBreak(UUID.fromString(seedData.getOwner()), seedData.getSeed());
             DPCFFuntion.drop(seedData, false);
         }
@@ -123,6 +137,10 @@ public class DPCFEvent implements Listener {
         if (e.getInventory().getHolder() instanceof DInventory) {
             DInventory inv = (DInventory) e.getInventory().getHolder();
             if (inv.isValidHandler(CustomFarming.plugin)) {
+                if (inv.isValidChannel(100)) {
+                    e.setCancelled(true);
+                    return;
+                }
                 if (e.getCurrentItem() == null || e.getCurrentItem().getType().isAir()) return;
                 ItemStack item = e.getCurrentItem();
                 if (NBT.hasTagKey(item, "dpcf_pane")) {
@@ -150,12 +168,13 @@ public class DPCFEvent implements Listener {
         }
     }
 
-    @EventHandler
-    public void onBlockPhysic(BlockPhysicsEvent e) {
-        if (DPCFFuntion.isSeed(e.getBlock().getWorld().getName(), e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ())) {
-            e.setCancelled(true);
-        }
-    }
+//    @EventHandler
+//    public void onBlockPhysic(BlockPhysicsEvent e) { // 렉 원인
+//        if (DPCFFuntion.isSeed(e.getBlock().getWorld().getName(), e.getBlock().getX(), e.getBlock().getY(), e.getBlock().getZ())) {
+//            e.setCancelled(true);
+//            System.out.println("[DPCF] BlockPhysicsEvent Cancelled at " + e.getBlock().getLocation().toString());
+//        }
+//    }
 
     @EventHandler
     public void onBlockBreakByWater(BlockFromToEvent e) {
@@ -165,7 +184,7 @@ public class DPCFEvent implements Listener {
         y = b.getY();
         z = b.getZ();
         if (DPCFFuntion.isSeed(b.getWorld().getName(), x, y, z)) {
-            if(e.getBlock().getType() == org.bukkit.Material.WATER) {
+            if (e.getBlock().getType() == org.bukkit.Material.WATER) {
                 e.setCancelled(true);
             }
         }
@@ -180,6 +199,35 @@ public class DPCFEvent implements Listener {
         z = b.getZ();
         if (DPCFFuntion.isSeed(b.getWorld().getName(), x, y, z)) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockPlace2(BlockPlaceEvent e) {
+        Block block = e.getBlock().getRelative(BlockFace.DOWN);
+        int x, y, z;
+        x = block.getX();
+        y = block.getY();
+        z = block.getZ();
+        if (DPCFFuntion.isSeed(block.getWorld().getName(), x, y, z)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBlockFade(BlockFadeEvent event) {
+        if (event.getBlock().getType() == Material.FARMLAND &&
+                event.getNewState().getType() == Material.DIRT) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() == Action.PHYSICAL &&
+                event.getClickedBlock() != null &&
+                event.getClickedBlock().getType() == Material.FARMLAND) {
+            event.setCancelled(true);
         }
     }
 }

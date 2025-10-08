@@ -39,7 +39,7 @@ public class DPCFFuntion {
     }
 
     public static void loadSeedData() {
-        Set<SeedData> seedDataSet = new HashSet<>();
+        ArrayList<SeedData> seedDataSet = new ArrayList<>();
 
         if (data.isConfigurationSection("Data")) {
             for (String uuid : data.getConfigurationSection("Data").getKeys(false)) {
@@ -74,6 +74,7 @@ public class DPCFFuntion {
     public static void initTask() {
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             for (SeedData seedData : plugin.seedDataSet) {
+                if (!seeds.containsKey(seedData.getSeed())) continue;
                 World world = Bukkit.getWorld(seedData.getWorld());
                 if (seedData.isBlockedGrowByUnloadedChunk()) {
                     if (world == null) continue;
@@ -156,7 +157,8 @@ public class DPCFFuntion {
     }
 
     public static boolean isSeed(String world, int x, int y, int z) {
-        for (SeedData seedData : plugin.seedDataSet) {
+        for (int i = 0; i < plugin.seedDataSet.size(); i++) {
+            SeedData seedData = plugin.seedDataSet.get(i);
             if (seedData.getWorld().equalsIgnoreCase(world) && seedData.getX() == x && seedData.getY() == y && seedData.getZ() == z) {
                 return true;
             }
@@ -164,8 +166,13 @@ public class DPCFFuntion {
         return false;
     }
 
+    public static void removeSeedData(String world, int x, int y, int z) {
+        plugin.seedDataSet.removeIf(seedData -> seedData.getWorld().equalsIgnoreCase(world) && seedData.getX() == x && seedData.getY() == y && seedData.getZ() == z);
+    }
+
     public static SeedData getSeedData(String world, int x, int y, int z) {
-        for (SeedData seedData : plugin.seedDataSet) {
+        for (int i = 0; i < plugin.seedDataSet.size(); i++) {
+            SeedData seedData = plugin.seedDataSet.get(i);
             if (seedData.getX() == x && seedData.getY() == y && seedData.getZ() == z && seedData.getWorld().equalsIgnoreCase(world)) {
                 return seedData;
             }
@@ -176,6 +183,7 @@ public class DPCFFuntion {
     @Nullable
     public static ItemStack getSeedItem(String seed) {
         YamlConfiguration data = getSeed(seed);
+        if (data == null) return null;
         ItemStack item = data.getItemStack("Seeds." + seed + ".ItemMaterial");
         if (item == null) return null;
         ItemMeta meta = item.getItemMeta();
@@ -384,7 +392,7 @@ public class DPCFFuntion {
         }
 
         YamlConfiguration data = getSeed(seedData.getSeed());
-        if(data == null) {
+        if (data == null) {
             plugin.seedDataSet.remove(seedData);
             System.out.println("[DPCF] Error: Seed data not found for seed " + seedData.getSeed() + ". Removing seed data.");
             System.out.println("[DPCF] you can ignore this message, this data is old seed data.");
@@ -424,24 +432,23 @@ public class DPCFFuntion {
         }
         Block targetBlock = world.getBlockAt(x, y, z);
         Material itemType = item.getType();
-        if (itemType.isBlock()) {
-            BlockData blockData = item.getType().createBlockData();
-            targetBlock.setBlockData(blockData);
-            if (targetBlock instanceof Ageable) {
-                Ageable ageable = (Ageable) targetBlock.getBlockData();
-                ageable.setAge(100000);
-                targetBlock.setBlockData(ageable);
-                return;
-            }
-            if (itemType == Material.PLAYER_HEAD || itemType == Material.SKELETON_SKULL || itemType == Material.ZOMBIE_HEAD || itemType == Material.CREEPER_HEAD || itemType == Material.WITHER_SKELETON_SKULL || itemType == Material.DRAGON_HEAD) {
-                if (targetBlock.getState() instanceof Skull) {
-                    Skull skull = (Skull) targetBlock.getState();
-                    if (item.getItemMeta() instanceof SkullMeta) {
-                        SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
-                        skull.setOwnerProfile(skullMeta.getOwnerProfile());
-                        targetBlock.setBlockData(skull.getBlockData());
-                        skull.update();
-                    }
+        BlockData blockData = item.getType().createBlockData();
+        targetBlock.setType(blockData.getMaterial());
+        if (targetBlock instanceof Ageable) {
+            Ageable ageable = (Ageable) targetBlock.getBlockData();
+            ageable.setAge(100000);
+            targetBlock.setBlockData(ageable);
+            return;
+        }
+        if (itemType == Material.PLAYER_HEAD || itemType == Material.SKELETON_SKULL || itemType == Material.ZOMBIE_HEAD || itemType == Material.CREEPER_HEAD || itemType == Material.WITHER_SKELETON_SKULL || itemType == Material.DRAGON_HEAD) {
+            targetBlock.setType(Material.SKELETON_SKULL);
+            if (targetBlock.getState() instanceof Skull) {
+                Skull skull = (Skull) targetBlock.getState();
+                if (item.getItemMeta() instanceof SkullMeta) {
+                    SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
+                    skull.setOwnerProfile(skullMeta.getOwnerProfile());
+                    targetBlock.setBlockData(skull.getBlockData());
+                    skull.update();
                 }
             }
         }
@@ -529,7 +536,7 @@ public class DPCFFuntion {
         }
         YamlConfiguration data = getSeed(seed);
         List<String> worlds = data.getStringList("Seeds." + seed + ".WorldLimit");
-        for(String w : worlds) {
+        for (String w : worlds) {
             if (w.equalsIgnoreCase(world)) {
                 return true;
             }
@@ -584,5 +591,62 @@ public class DPCFFuntion {
         plugin.saveDataContainer();
         plugin.seeds.put(name, data);
         p.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_cmd_seedItemSaved"));
+    }
+
+    public static List<SeedData> getSeedDataSetByOwner(UUID owner) {
+        List<SeedData> list = new ArrayList<>();
+        for (SeedData seedData : plugin.seedDataSet) {
+            if (!plugin.seeds.containsKey(seedData.getSeed())) continue;
+            UUID seedOwner = UUID.fromString(seedData.getOwner());
+            if (seedOwner.equals(owner)) {
+                list.add(seedData);
+            }
+        }
+        return list;
+    }
+
+    public static void openMyGUI(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(plugin.getPrefix() + plugin.getLang().get("func_cmd_playerOnly"));
+            return;
+        }
+        Player p = (Player) sender;
+        HashMap<String, Integer> seedCount = new HashMap<>();
+        for (SeedData seedData : getSeedDataSetByOwner(p.getUniqueId())) {
+            String seed = seedData.getSeed();
+            if (seedCount.containsKey(seed)) {
+                seedCount.put(seed, seedCount.get(seed) + 1);
+            } else {
+                seedCount.put(seed, 1);
+            }
+        }
+        HashMap<String, Integer> grownSeedCount = new HashMap<>();
+        for (SeedData seedData : getSeedDataSetByOwner(p.getUniqueId())) {
+            String seed = seedData.getSeed();
+            if (!seedData.isGrow()) continue;
+            if (grownSeedCount.containsKey(seed)) {
+                grownSeedCount.put(seed, grownSeedCount.get(seed) + 1);
+            } else {
+                grownSeedCount.put(seed, 1);
+            }
+        }
+
+        DInventory inv = new DInventory("§6§l내 농작물 현황", 54, plugin);
+        for (String seed : seedCount.keySet()) {
+            ItemStack item = getSeedItem(seed);
+            if (item == null) continue;
+            ItemMeta meta = item.getItemMeta();
+            if (meta == null) continue;
+            List<String> lore = meta.getLore();
+            if (lore == null) lore = new ArrayList<>();
+            lore.add("§e현재 심어진 개수: §f" + seedCount.get(seed) + "개");
+            lore.add("§a성장 완료된 개수: §f" + grownSeedCount.getOrDefault(seed, 0) + "개 (" + ((int) ((double) grownSeedCount.getOrDefault(seed, 0) / (double) seedCount.get(seed) * 100)) + "%)");
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+            inv.addItem(item);
+        }
+        inv.applyChanges();
+        inv.setChannel(100);
+        inv.openInventory(p);
     }
 }

@@ -19,7 +19,7 @@ import java.util.*;
 public class CustomFarming extends DPlugin {
     public static CustomFarming plugin;
     public static YamlConfiguration data;
-    public static Set<SeedData> seedDataSet;
+    public static ArrayList<SeedData> seedDataSet;
     public static final Map<UUID, Tuple<Integer, String>> chanceSet = new HashMap<>();
     public static DataContainer<UUID, YamlConfiguration> udata;
     public static DataContainer<String, YamlConfiguration> seeds;
